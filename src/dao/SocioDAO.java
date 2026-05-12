@@ -1,0 +1,106 @@
+package dao;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.TypedQuery;
+import modelo.Gimnasio;
+import modelo.Socio;
+
+import java.util.List;
+
+public class SocioDAO {
+    EntityManagerFactory emf;
+
+    public SocioDAO(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
+
+    public void insertarSocio(Socio socio) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        em.persist(socio);
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    public void actualizarSocio(int id, String nombreCompleto, int edad, boolean vip) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Socio s = em.find(Socio.class, id);
+        if (s != null) {
+            s.setNombreCompleto(nombreCompleto);
+            s.setEdad(edad);
+            s.setVip(vip);
+        }
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    public void borrarSocio(int id) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Socio s = em.find(Socio.class, id);
+        if (s != null) {
+            for (Gimnasio g : s.getGimnasios()) {
+                g.getSocios().remove(s);
+            }
+            em.remove(s);
+        }
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    public void asignarSocio(int idSocio, int idGimnasio) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Socio s = em.find(Socio.class, idSocio);
+        Gimnasio g = em.find(Gimnasio.class, idGimnasio);
+        if (s != null && g != null) {
+            if (!s.getGimnasios().contains(g)) {
+                s.getGimnasios().add(g);
+                g.getSocios().add(s);
+            }
+        }
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    public void borrarSocioDeGimnasio(int idSocio, int idGimnasio) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        Socio s = em.find(Socio.class, idSocio);
+        Gimnasio g = em.find(Gimnasio.class, idGimnasio);
+        if (s != null && g != null) {
+            s.getGimnasios().remove(g);
+            g.getSocios().remove(s);
+        }
+        em.getTransaction().commit();
+        em.close();
+    }
+
+    public List<Gimnasio> obtenerGimnasiosDeSocio(int id) {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Gimnasio> query = em.createQuery("select g from Gimnasio g join g.socios s where s.id = :id", Gimnasio.class);
+        query.setParameter("id", id);
+        List<Gimnasio> gimnasios = query.getResultList();
+        em.close();
+        return gimnasios;
+    }
+
+    public double obtenerMediaEdadSocios() {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Double> query = em.createQuery("select avg(s.edad) from Socio s", Double.class);
+        Double media = query.getSingleResult();
+        double res = media != null ? media : 0.0;
+        em.close();
+        return res;
+    }
+
+    public List<Socio> obtenerSociosSinGimnasio() {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Socio> query = em.createQuery("select s from Socio s where s.gimnasios is empty", Socio.class);
+        List<Socio> socios = query.getResultList();
+        em.close();
+        return socios;
+    }
+}
