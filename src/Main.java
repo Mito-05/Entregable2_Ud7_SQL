@@ -12,25 +12,25 @@ void main() {
     GimnasioDAO gymDAO = new GimnasioDAO(emf);
     SocioDAO socioDAO = new SocioDAO(emf);
 
-    Gimnasio gymDemo = new Gimnasio("Gym Center", "Madrid", 39.90);
-    gymDAO.insertarGimnasio(gymDemo);
-    System.out.println(gymDemo);
+    Gimnasio gym = new Gimnasio("Gym Center", "Madrid", 39.90);
+    gymDAO.insertarGimnasio(gym);
+    System.out.println(gym);
 
-    gymDemo.setNombre("Gym Center Premium");
-    gymDemo.setCuotaMensual(49.90);
-    gymDAO.actualizarGimnasio(gymDemo.getId(), gymDemo.getNombre(), gymDemo.getCiudad(), gymDemo.getCuotaMensual());
+    gym.setNombre("Gym Center Premium");
+    gym.setCuotaMensual(49.90);
+    gymDAO.actualizarGimnasio(gym.getId(), gym.getNombre(), gym.getCiudad(), gym.getCuotaMensual());
 
-    gymDAO.borrarGimnasio(gymDemo.getId());
+    gymDAO.borrarGimnasio(gym.getId());
 
-    Socio socioDemo = new Socio("Julian Chavez", 30, false);
-    socioDAO.insertarSocio(socioDemo);
-    System.out.println(socioDemo);
+    Socio socio = new Socio("Julian Chavez", 30, false);
+    socioDAO.insertarSocio(socio);
+    System.out.println(socio);
 
-    socioDemo.setEdad(31);
-    socioDemo.setVip(true);
-    socioDAO.actualizarSocio(socioDemo.getId(), socioDemo.getNombreCompleto(), socioDemo.getEdad(), socioDemo.isVip());
+    socio.setEdad(31);
+    socio.setVip(true);
+    socioDAO.actualizarSocio(socio.getId(), socio.getNombreCompleto(), socio.getEdad(), socio.isVip());
 
-    socioDAO.borrarSocio(socioDemo.getId());
+    socioDAO.borrarSocio(socio.getId());
 
     gymDAO.obtenerSociosDeGimnasio(1).forEach(System.out::println);
 
